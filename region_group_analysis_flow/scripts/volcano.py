@@ -97,7 +97,7 @@ def volcano_plot(input, output_dir, gr1, gr2, plot=True, transpose=False, fc_thr
     # filter out rows where one group only contains zero values
     df_data['gr1_sum'] = df_data[gr1_cols].sum(axis=1)
     df_data['gr2_sum'] = df_data[gr2_cols].sum(axis=1)
-    #df_data = df_data.loc[(df_data['gr1_sum'] > 0) & (df_data['gr2_sum'] > 0)]
+    df_data = df_data.loc[(df_data['gr1_sum'] > 0) & (df_data['gr2_sum'] > 0)]
 
     arr_gr1 = df_data[gr1_cols].to_numpy().astype(float)
     arr_gr2 = df_data[gr2_cols].to_numpy().astype(float)
