@@ -80,7 +80,7 @@ fabric.properties
 *.webp
 
 # Portable Network Graphics
-*.png
+#*.png
 
 # Animated Portable Network Graphics
 *.apng
@@ -90,10 +90,10 @@ fabric.properties
 
 # Tagged Image File Format
 *.tiff
-*.tif
+#*.tif
 
 # Scalable Vector Graphics
-*.svg
+.svg
 *.svgz
 
 # Portable Document Format
@@ -342,3 +342,16 @@ results_*
 
 # snakemake
 .snakemake
+
+AGENTS.md
+docs/
+result_data/
+#demo_control/
+#demo_full/
+
+*.ibd
+*.imzML
+*timestamp
+*.sav
+*.d
+demo_full/data/msi_if_registration/moving/UPEC_1*

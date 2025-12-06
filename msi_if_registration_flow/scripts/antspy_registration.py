@@ -61,10 +61,13 @@ def apply_transform(fixed_img, moving_img_stack, transformlist, interpolator="li
     return reg_transf_img_stack
 
 
-def registration(fixed_img, moving_img, af_chan, out_dir, plot=False):
+def registration(fixed_img, moving_img, af_chan, out_file_path, transform_type='SyNRA', metric='mattes', plot=False):
     fixed_fn = os.path.basename(fixed_img)
     moving_fn = os.path.basename(moving_img)
     af_chan -= 1
+    
+    # Derive out_dir for auxiliary files
+    out_dir = os.path.dirname(out_file_path)
 
     fixed_img = tifffile.imread(fixed_img)
     moving_img_stack = tifffile.imread(moving_img)
@@ -82,9 +85,10 @@ def registration(fixed_img, moving_img, af_chan, out_dir, plot=False):
     # # Registration
     # Using Symmetric Normalization transformation, optimising the mattes mutual information between the fixed and
     # moving images
+    print(f"Running registration with transform type: {transform_type}, metric: {metric}")
     RegImage = ants.registration(ants.from_numpy(fixed_img),
                                  ants.from_numpy(moving_img),
-                                 "SyNRA", syn_metric='mattes',)
+                                 transform_type, syn_metric=metric,)
     # Reg_Image is a dictionary containing the transformed image from moving to
     # fixed space (warpedmovout, and warpedfixout respectively) and vise versa, and the
     # coressponding transformations (fwdtransforms, and invtransforms respectively)
@@ -98,7 +102,7 @@ def registration(fixed_img, moving_img, af_chan, out_dir, plot=False):
     # Transforming the moving mask to the fixed space based on the transformation learned from registering the images
     reg_transf_img_stack = apply_transform(fixed_img=fixed_img, moving_img_stack=moving_img_stack,
                                            transformlist=Fwd_trans, interpolator="linear")
-    tifffile.imwrite(os.path.join(out_dir, moving_fn), reg_transf_img_stack.astype('uint8'), photometric='minisblack')
+    tifffile.imwrite(out_file_path, reg_transf_img_stack.astype('uint8'), photometric='minisblack')
 
     RegMovToFix = RegImage['warpedmovout'].numpy()
     #tifffile.imwrite(os.path.join(out_dir, 'reg_' + moving_fn), RegMovToFix.astype('uint8'), photometric='minisblack')
@@ -109,10 +113,12 @@ def registration(fixed_img, moving_img, af_chan, out_dir, plot=False):
 
     pil_overlay_before_reg = Image.fromarray(overlay_before_reg)
     pil_overlay_after_reg = Image.fromarray(overlay_after_reg)
-
-    pil_overlay_before_reg.save(os.path.join(out_dir, moving_fn.split('.')[0] + '_before_registration_overlay.tif'),
+    
+    # Use output filename prefix for overlays
+    out_fn_base = os.path.basename(out_file_path).split('.')[0]
+    pil_overlay_before_reg.save(os.path.join(out_dir, out_fn_base + '_before_registration_overlay.tif'),
                                 format='TIFF')
-    pil_overlay_after_reg.save(os.path.join(out_dir, moving_fn.split('.')[0] + '_after_registration_overlay.tif'),
+    pil_overlay_after_reg.save(os.path.join(out_dir, out_fn_base + '_after_registration_overlay.tif'),
                                format='TIFF')
 
     if plot:
@@ -125,19 +131,25 @@ if __name__ == '__main__':
     parser.add_argument('fixed_img', type=str, help='path to fixed UMAP image')
     parser.add_argument('moving_img', type=str, help='path to moving image tif stack containing AF image')
     parser.add_argument('-af_chan', type=int, default=0, help='autofluorescence image channel')
+    parser.add_argument('-transform_type', type=str, default='SyNRA', help='Transformation type for registration (e.g., Rigid, Affine, SyN, SyNRA)')
+    parser.add_argument('-metric', type=str, default='mattes', help='Metric for registration (e.g., mattes, CC, MI)')
     parser.add_argument('-out_file', type=str, default='', help='registered output file')
     parser.add_argument('-plot', type=bool, default=False, help='set to True to plot')
     args = parser.parse_args()
 
     if args.out_file == '':
         out_dir = os.path.abspath(os.path.join(os.path.dirname(args.moving_img), 'registered'))
+        fn = os.path.basename(args.moving_img)
+        args.out_file = os.path.join(out_dir, fn)
     else:
         out_dir = os.path.dirname(args.out_file)
-    fn = os.path.basename(args.moving_img)
-    args.out_file = os.path.join(out_dir, fn)
+        if out_dir == '': # Handle case where only filename is provided
+            out_dir = '.'
+            args.out_file = os.path.join(out_dir, args.out_file)
+    
     if not os.path.exists(out_dir):
-        os.mkdir(out_dir)
+        os.makedirs(out_dir, exist_ok=True) # use makedirs for recursive creation
 
-    registration(args.fixed_img, args.moving_img, args.af_chan, out_dir, args.plot)
+    registration(args.fixed_img, args.moving_img, args.af_chan, args.out_file, args.transform_type, args.metric, args.plot)
 
 

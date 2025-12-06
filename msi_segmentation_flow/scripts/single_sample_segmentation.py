@@ -21,7 +21,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 from pkg import utils
 from pkg.SA import SA
 from pkg.plot import scatterplot_3D, scatterplot_2D, construct_spot_image, plot_img_heatmap, get_spec_img
-from pkg.clustering import kmeans_clustering, HDBSCAN_clustering, gaussian_mixture, hierarchical_clustering
+from pkg.clustering import kmeans_clustering, HDBSCAN_clustering, gaussian_mixture, hierarchical_clustering, spectral_clustering
 
 warnings.filterwarnings('ignore', module='pyimzml')
 
@@ -180,6 +180,11 @@ def segmentation(df, general_dict, cluster_dict):
             class_labels = hierarchical_clustering(data=sp_data, k=cluster_dict['n_clusters'])
         elif cluster_dict['cluster'] == 'gaussian_mixture':
             class_labels = gaussian_mixture(data=sp_data, k=cluster_dict['n_clusters'])
+        elif cluster_dict['cluster'] == 'spectral':
+            print('Spectral clustering...')
+            class_labels = spectral_clustering(data=sp_data, k=cluster_dict['n_clusters'])
+            # Ensure labels start from 1 to match others
+            class_labels = class_labels + 1
         #elif cluster_dict['cluster'] == 'som':
         #    class_labels = som(data=sp_data, k=cluster_dict['n_clusters'])
         else:
@@ -373,7 +378,7 @@ if __name__ == '__main__':
     # if not os.path.exists(args.result_dir):
     #     os.mkdir(args.result_dir)
     try:
-        os.mkdir(args.result_dir)
+        os.makedirs(args.result_dir, exist_ok=True)
     except OSError:
         pass
     if args.cluster != '':
@@ -384,7 +389,7 @@ if __name__ == '__main__':
         #if not os.path.exists(os.path.abspath(cluster_dir)):
         #    os.mkdir(os.path.abspath(cluster_dir))
         try:
-            os.mkdir(cluster_dir)
+            os.makedirs(cluster_dir, exist_ok=True)
         except OSError:
             pass
 
