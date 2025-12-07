@@ -40,7 +40,7 @@ bash run_demo_control.sh
 bash run_demo_full.sh
 ```
 
-这里的control是指我们下载的是control_02数据集进行预处理流程复现。在复现过程终我们发现在官方提供的数据集终control组只有msi原始数据没有ifm原始数据，（推测是control组没有进行中性粒细胞染色，故没有进行ifm实验）因此无法进行msi_if_registration与后续流程的复现。full是指我们下载了完整的msi_if_registration数据集，可以复现完整的msi_if_registration、if_segmentation与molecular_signatures流程。
+这里的run_demo_control是指我们下载的是control_02数据集进行预处理流程复现。在复现过程终我们发现在官方提供的数据集终control组只有msi原始数据没有ifm原始数据，（推测是control组没有进行中性粒细胞染色，故没有进行ifm实验）因此无法进行msi_if_registration与后续流程的复现。run_demo_full是指我们下载了完整的msi_if_registration数据集，可以复现完整的msi_if_registration、if_segmentation与molecular_signatures流程。
 
 为验证即插即用能力并优化关键环节（MSI-IFM 配准、MSI 分割），我们在原流程上做了多项改进。
 
@@ -120,7 +120,7 @@ python msi_segmentation_flow/scripts/single_sample_segmentation.py \
 
 更多实验、参数与可视化详见 `docs/registration_experiment_report.md` 与 `docs/segmentation_optimization_report.md`。
 
-### 自动报告
+#### 自动报告
 
 自研 `report.py` 支持生成 Markdown 报告并转换 tif 为 png，示例：
 
@@ -131,7 +131,7 @@ python report.py demo/data/Ly6G_signatures
 
 脚本会在 `./report` 下生成对应报告并复制必要资源。
 
-### 辅助 python 文件
+#### 辅助 python 文件
 
 部分 tif 过大，vscode 插件预览受限，可用 `show_tif.py` 转换预览：
 
@@ -150,10 +150,11 @@ python show_Ly6G_on_msi.py \
 
 脚本会在 msi的tif文件 所在目录下输出 msi、ifm 及叠加的 png。
 
-#### 组内分工
+### 组内分工
 - 代码流程复现： 张章、朱昊东
-- `registration`与`ifm`分割优化：张章
+- 多模态配准优化与图像分割优化：张章
 - 使用contro_02数据集复现`msi_preprocessing流程`与使用完整的msi_if_registration数据集复现`msi_if_registration`、`if_segmentation`、`molecular_signatures`流程： 朱昊东
 - 自动报告脚本与辅助`tif`文件脚本开发： 朱昊东
 - 论文汇报大纲梳理： 彭梓浥
+- 海报制作： 彭梓浥
 - ppt撰写： 彭梓浥、张章、朱昊东
