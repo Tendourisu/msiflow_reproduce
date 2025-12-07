@@ -18,7 +18,7 @@ def normalize_to_uint8(img):
     img_uint8 = (img_rescaled * 255).astype(np.uint8)
     return img_uint8
 
-def feature_registration(fixed_img_path, moving_img_path, af_chan, out_file_path, method='ORB', plot=False):
+def feature_registration(fixed_img_path, moving_img_path, af_chan, out_file_path, method='ORB', top_k=0, plot=False):
     # 1. Read Images
     print(f"Reading Fixed: {fixed_img_path}")
     fixed_img = tifffile.imread(fixed_img_path)
@@ -69,7 +69,11 @@ def feature_registration(fixed_img_path, moving_img_path, af_chan, out_file_path
     
     # Keep top matches
     # good_matches = matches[:int(len(matches) * 0.5)]
-    good_matches = matches # RANSAC handles outliers well, pass all reasonably good ones?
+    if top_k > 0:
+        good_matches = matches[:top_k]
+    else:
+        good_matches = matches # Use all matches
+        
     print(f"Using {len(good_matches)} matches for estimation.")
 
     if len(good_matches) < 4:
@@ -133,11 +137,12 @@ if __name__ == '__main__':
     parser.add_argument('-af_chan', type=int, default=1, help='autofluorescence image channel (1-based)')
     parser.add_argument('-out_file', type=str, required=True, help='registered output file path')
     parser.add_argument('-method', type=str, default='ORB', help='Feature detector: ORB, SIFT, AKAZE')
+    parser.add_argument('-top_k', type=int, default=0, help='Number of top matches to keep (0 for all)')
     parser.add_argument('-plot', action='store_true', help='Generate debug plots')
     
     args = parser.parse_args()
 
-    feature_registration(args.fixed_img, args.moving_img, args.af_chan, args.out_file, args.method, args.plot)
+    feature_registration(args.fixed_img, args.moving_img, args.af_chan, args.out_file, args.method, args.top_k, args.plot)
 
 
 

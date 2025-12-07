@@ -14,6 +14,3 @@ mkdir demo_full/data/ly6g_molecular_signatures/bin_imgs
 cp demo_full/data/if_segmentation/segmented/UPEC_12.tif demo_full/data/ly6g_molecular_signatures/bin_imgs
 # run molecular_signatures_flow to extract lipidomic signatures of Ly6G (neutrophils)
 snakemake --snakefile molecular_signatures_flow/Snakefile --configfile demo_full/data/ly6g_molecular_signatures/config.yaml --config data='demo_full/data/ly6g_molecular_signatures' --cores all
-
-
-snakemake --snakefile region_group_analysis_flow/Snakefile --configfile demo_full/data/region_group_analysis/config.yaml --config data='demo_full/data/region_group_analysis' --cores all

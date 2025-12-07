@@ -1,6 +1,11 @@
 data: "data"
 
 if_preprocessing:
+  # original parameters
+  # radius: 0
+  # sigma: 0
+  # lower_perc: 0.0
+  # upper_perc: 0.0
   radius: 100
   sigma: 1
   lower_perc: 0.0
